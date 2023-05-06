@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdk8s-nextcloud-nextcloud-deployment-c8042e99
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cdk8s-nextcloud-nextcloud-c8a81601
+  template:
+    metadata:
+      labels:
+        app: cdk8s-nextcloud-nextcloud-c8a81601
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_HOST
+              value: mysql
+            - name: MYSQL_DATABASE
+              value: nextclouddb
+            - name: MYSQL_USER
+              value: nextclouddb-user
+            - name: MYSQL_PASSWORD
+              value: nextclouddb-secret
+          image: nextcloud:latest
+          name: nextcloud
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 200m
+              memory: 250Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdk8s-nextcloud-nextcloud-service-c8994f5f
+spec:
+  ports:
+    - port: 27015
+      targetPort: 80
+  selector:
+    app: cdk8s-nextcloud-nextcloud-c8a81601
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdk8s-nextcloud-mysql-deployment-c8f0d3d8
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cdk8s-nextcloud-mysql-c8c453af
+  template:
+    metadata:
+      labels:
+        app: cdk8s-nextcloud-mysql-c8c453af
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: nextclouddb
+            - name: MYSQL_USER
+              value: nextclouddb-user
+            - name: MYSQL_PASSWORD
+              value: nextclouddb-secret
+            - name: MYSQL_ROOT_PASSWORD
+              value: nextclouddb-root-secret
+          image: mysql:8.0-debian
+          name: mysql
+          ports:
+            - containerPort: 3306
+          resources:
+            limits:
+              cpu: 200m
+              memory: 550Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: rawfile-btrfs
