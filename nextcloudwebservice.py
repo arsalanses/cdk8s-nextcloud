@@ -19,6 +19,17 @@ class NextcloudWebService(Construct):
 
         label = {"app": Names.to_label_value(self)}
 
+        config_map = k8s.KubeConfigMap(
+            self,
+            'nextcloud-config-map',
+            data={
+                'MYSQL_HOST':       'mysql',
+                'MYSQL_DATABASE':   'nextclouddb',
+                'MYSQL_USER':       'nextclouddb-user',
+                'MYSQL_PASSWORD':   'nextclouddb-secret'
+            }
+        )
+
         k8s.KubeDeployment(
             self,
             "deployment",
@@ -32,23 +43,12 @@ class NextcloudWebService(Construct):
                             k8s.Container(
                                 name="nextcloud",
                                 image=image,
-                                env=[
-                                    k8s.EnvVar(
-                                        name='MYSQL_HOST',
-                                        value='mysql'
+                                env_from=[
+                                    k8s.EnvFromSource(
+                                        config_map_ref=k8s.ConfigMapEnvSource(
+                                            name=config_map.name,
+                                        ),
                                     ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_DATABASE',
-                                        value='nextclouddb'
-                                    ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_USER',
-                                        value='nextclouddb-user'
-                                    ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_PASSWORD',
-                                        value='nextclouddb-secret'
-                                    )
                                 ],
                                 ports=[
                                     k8s.ContainerPort(container_port=container_port)
