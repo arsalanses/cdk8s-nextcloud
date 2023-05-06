@@ -62,15 +62,28 @@ data:
   MYSQL_ROOT_PASSWORD: mysqldb-root-secret
   MYSQL_USER: mysqldb-user
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: cdk8s-nextcloud-mysql-deployment-c8f0d3d8
+  name: mysql-persistent-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rawfile-btrfs
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: cdk8s-nextcloud-mysql-c8c453af
+  serviceName: mysql
   template:
     metadata:
       labels:
@@ -81,7 +94,7 @@ spec:
             - configMapRef:
                 name: cdk8s-nextcloud-mysql-mysql-config-map-c8eded8b
           image: mysql:8.0-debian
-          name: mysql
+          name: mysql-container
           ports:
             - containerPort: 3306
           resources:
@@ -91,19 +104,22 @@ spec:
             requests:
               cpu: 100m
               memory: 200Mi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-persistent-storage
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
-            claimName: mysql-pvc
+            claimName: mysql-persistent-storage
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: Service
 metadata:
-  name: mysql-pvc
+  name: cdk8s-nextcloud-mysql-service-c836ab5d
 spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
-  storageClassName: rawfile-btrfs
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: cdk8s-nextcloud-mysql-c8c453af
+  type: ClusterIP

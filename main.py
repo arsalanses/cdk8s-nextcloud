@@ -13,7 +13,7 @@ class MyChart(Chart):
         # define resources here
         
         NextcloudWebService(self, 'nextcloud', image='nextcloud:latest', port=27015, container_port=80, replicas=2)
-        MysqlWebService(self, 'mysql', image='mysql:8.0-debian', replicas=1)
+        MysqlWebService(self, 'mysql', image='mysql:8.0-debian')
 
 app = App()
 MyChart(app, "cdk8s-nextcloud")
