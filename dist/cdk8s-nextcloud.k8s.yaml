@@ -53,12 +53,12 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cdk8s-nextcloud-mysql-nextcloud-config-map-c855f608
+  name: cdk8s-nextcloud-mysql-mysql-config-map-c8eded8b
 data:
-  MYSQL_DATABASE: nextclouddb
-  MYSQL_PASSWORD: nextclouddb-secret
-  MYSQL_ROOT_PASSWORD: nextclouddb-root-secret
-  MYSQL_USER: nextclouddb-user
+  MYSQL_DATABASE: mysqldb
+  MYSQL_PASSWORD: mysqldb-secret
+  MYSQL_ROOT_PASSWORD: mysqldb-root-secret
+  MYSQL_USER: mysqldb-user
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,7 +77,7 @@ spec:
       containers:
         - envFrom:
             - configMapRef:
-                name: cdk8s-nextcloud-mysql-nextcloud-config-map-c855f608
+                name: cdk8s-nextcloud-mysql-mysql-config-map-c8eded8b
           image: mysql:8.0-debian
           name: mysql
           ports:
