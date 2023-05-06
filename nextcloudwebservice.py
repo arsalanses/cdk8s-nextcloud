@@ -23,10 +23,12 @@ class NextcloudWebService(Construct):
             self,
             'nextcloud-config-map',
             data={
-                'MYSQL_HOST':       'mysql',
-                'MYSQL_DATABASE':   'nextclouddb',
-                'MYSQL_USER':       'nextclouddb-user',
-                'MYSQL_PASSWORD':   'nextclouddb-secret'
+                'nextcloud_admin_user':     'admin',
+                'nextcloud_admin_password': 'secret',
+                'MYSQL_HOST':               'mysql',
+                'MYSQL_DATABASE':           'nextclouddb',
+                'MYSQL_USER':               'nextclouddb-user',
+                'MYSQL_PASSWORD':           'nextclouddb-secret'
             }
         )
 
