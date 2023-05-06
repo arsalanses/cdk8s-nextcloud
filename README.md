@@ -12,3 +12,8 @@ kubectl apply -f dist/cdk8s-nextcloud.k8s.yaml
 kubectl port-forward my-pod 8080:80
 kubectl exec -it my-pod bash
 ```
+
+```bash
+pipenv install --dev
+pipenv shell
+```
