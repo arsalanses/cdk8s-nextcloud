@@ -50,6 +50,16 @@ spec:
     app: cdk8s-nextcloud-nextcloud-c8a81601
   type: LoadBalancer
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cdk8s-nextcloud-mysql-nextcloud-config-map-c855f608
+data:
+  MYSQL_DATABASE: nextclouddb
+  MYSQL_PASSWORD: nextclouddb-secret
+  MYSQL_ROOT_PASSWORD: nextclouddb-root-secret
+  MYSQL_USER: nextclouddb-user
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -65,15 +75,9 @@ spec:
         app: cdk8s-nextcloud-mysql-c8c453af
     spec:
       containers:
-        - env:
-            - name: MYSQL_DATABASE
-              value: nextclouddb
-            - name: MYSQL_USER
-              value: nextclouddb-user
-            - name: MYSQL_PASSWORD
-              value: nextclouddb-secret
-            - name: MYSQL_ROOT_PASSWORD
-              value: nextclouddb-root-secret
+        - envFrom:
+            - configMapRef:
+                name: cdk8s-nextcloud-mysql-nextcloud-config-map-c855f608
           image: mysql:8.0-debian
           name: mysql
           ports:

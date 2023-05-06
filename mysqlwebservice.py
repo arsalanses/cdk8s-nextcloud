@@ -19,6 +19,17 @@ class MysqlWebService(Construct):
 
         label = {"app": Names.to_label_value(self)}
 
+        config_map = k8s.KubeConfigMap(
+            self,
+            'mysql-config-map',
+            data={
+                'MYSQL_DATABASE':       'mysqldb',
+                'MYSQL_USER':           'mysqldb-user',
+                'MYSQL_PASSWORD':       'mysqldb-secret',
+                'MYSQL_ROOT_PASSWORD':  'mysqldb-root-secret',
+            }
+        )
+
         k8s.KubeDeployment(
             self,
             "deployment",
@@ -35,23 +46,12 @@ class MysqlWebService(Construct):
                                 ports=[
                                     k8s.ContainerPort(container_port=container_port)
                                 ],
-                                env=[
-                                    k8s.EnvVar(
-                                        name='MYSQL_DATABASE',
-                                        value='nextclouddb'
+                                env_from=[
+                                    k8s.EnvFromSource(
+                                        config_map_ref=k8s.ConfigMapEnvSource(
+                                            name=config_map.name,
+                                        ),
                                     ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_USER',
-                                        value='nextclouddb-user'
-                                    ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_PASSWORD',
-                                        value='nextclouddb-secret'
-                                    ),
-                                    k8s.EnvVar(
-                                        name='MYSQL_ROOT_PASSWORD',
-                                        value='nextclouddb-root-secret'
-                                    )
                                 ],
                                 resources=k8s.ResourceRequirements(
                                     limits={
