@@ -57,10 +57,10 @@ kind: ConfigMap
 metadata:
   name: cdk8s-nextcloud-mysql-mysql-config-map-c8eded8b
 data:
-  MYSQL_DATABASE: mysqldb
-  MYSQL_PASSWORD: mysqldb-secret
+  MYSQL_DATABASE: nextclouddb
+  MYSQL_PASSWORD: nextclouddb-secret
   MYSQL_ROOT_PASSWORD: mysqldb-root-secret
-  MYSQL_USER: mysqldb-user
+  MYSQL_USER: nextclouddb-user
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

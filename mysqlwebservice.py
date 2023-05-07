@@ -23,9 +23,9 @@ class MysqlWebService(Construct):
             self,
             'mysql-config-map',
             data={
-                'MYSQL_DATABASE':       'mysqldb',
-                'MYSQL_USER':           'mysqldb-user',
-                'MYSQL_PASSWORD':       'mysqldb-secret',
+                'MYSQL_DATABASE':       'nextclouddb',
+                'MYSQL_USER':           'nextclouddb-user',
+                'MYSQL_PASSWORD':       'nextclouddb-secret',
                 'MYSQL_ROOT_PASSWORD':  'mysqldb-root-secret',
             }
         )
