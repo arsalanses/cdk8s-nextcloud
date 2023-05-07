@@ -46,7 +46,7 @@ class MysqlWebService(Construct):
         )
 
         container = k8s.Container(
-            name='mysql-container',
+            name='mysql',
             image=image,
             env_from=[
                 k8s.EnvFromSource(
@@ -69,7 +69,7 @@ class MysqlWebService(Construct):
                 },
             ),
             volume_mounts=[
-                k8s.VolumeMount(name='mysql-persistent-storage', mount_path='/var/lib/mysql'),
+                k8s.VolumeMount(name='mysql-data', mount_path='/var/lib/mysql'),
             ],
         )
 
@@ -101,6 +101,7 @@ class MysqlWebService(Construct):
         k8s.KubeService(
             self,
             "service",
+            metadata=k8s.ObjectMeta(name="mysql"),
             spec=k8s.ServiceSpec(
                 type="ClusterIP",
                 ports=[

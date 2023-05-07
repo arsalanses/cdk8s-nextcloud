@@ -28,7 +28,7 @@ spec:
         - envFrom:
             - configMapRef:
                 name: cdk8s-nextcloud-nextcloud-nextcloud-config-map-c847fcff
-          image: nextcloud:latest
+          image: nextcloud:26.0.1-apache
           name: nextcloud
           ports:
             - containerPort: 80
@@ -43,7 +43,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cdk8s-nextcloud-nextcloud-service-c8994f5f
+  name: nextcloud
 spec:
   ports:
     - port: 27015
@@ -94,7 +94,7 @@ spec:
             - configMapRef:
                 name: cdk8s-nextcloud-mysql-mysql-config-map-c8eded8b
           image: mysql:8.0-debian
-          name: mysql-container
+          name: mysql
           ports:
             - containerPort: 3306
           resources:
@@ -106,7 +106,7 @@ spec:
               memory: 200Mi
           volumeMounts:
             - mountPath: /var/lib/mysql
-              name: mysql-persistent-storage
+              name: mysql-data
       volumes:
         - name: mysql-data
           persistentVolumeClaim:
@@ -115,7 +115,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cdk8s-nextcloud-mysql-service-c836ab5d
+  name: mysql
 spec:
   ports:
     - port: 3306

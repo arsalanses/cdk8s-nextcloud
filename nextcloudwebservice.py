@@ -32,6 +32,47 @@ class NextcloudWebService(Construct):
             }
         )
 
+        container = k8s.Container(
+            name="nextcloud",
+            image=image,
+            env_from=[
+                k8s.EnvFromSource(
+                    config_map_ref=k8s.ConfigMapEnvSource(
+                        name=config_map.name,
+                    ),
+                ),
+            ],
+            ports=[
+                k8s.ContainerPort(container_port=container_port)
+            ],
+            resources=k8s.ResourceRequirements(
+                limits={
+                    "cpu": k8s.Quantity.from_string("200m"),
+                    "memory": k8s.Quantity.from_string("250Mi"),
+                },
+                requests={
+                    "cpu": k8s.Quantity.from_string("100m"),
+                    "memory": k8s.Quantity.from_string("100Mi"),
+                },
+            ),
+            # liveness_probe=k8s.Probe(
+            #     http_get=k8s.HttpGetAction(
+            #         path='/index.php',
+            #         port=k8s.IntOrString.from_number(80)
+            #     ),
+            #     initial_delay_seconds=60,
+            #     period_seconds=10,
+            # ),
+            # readiness_probe=k8s.Probe(
+            #     http_get=k8s.HttpGetAction(
+            #         path='/index.php',
+            #         port=k8s.IntOrString.from_number(80)
+            #     ),
+            #     initial_delay_seconds=10,
+            #     period_seconds=5,
+            # ),
+        )
+
         k8s.KubeDeployment(
             self,
             "deployment",
@@ -41,48 +82,7 @@ class NextcloudWebService(Construct):
                 template=k8s.PodTemplateSpec(
                     metadata=k8s.ObjectMeta(labels=label),
                     spec=k8s.PodSpec(
-                        containers=[
-                            k8s.Container(
-                                name="nextcloud",
-                                image=image,
-                                env_from=[
-                                    k8s.EnvFromSource(
-                                        config_map_ref=k8s.ConfigMapEnvSource(
-                                            name=config_map.name,
-                                        ),
-                                    ),
-                                ],
-                                ports=[
-                                    k8s.ContainerPort(container_port=container_port)
-                                ],
-                                resources=k8s.ResourceRequirements(
-                                    limits={
-                                        "cpu": k8s.Quantity.from_string("200m"),
-                                        "memory": k8s.Quantity.from_string("250Mi"),
-                                    },
-                                    requests={
-                                        "cpu": k8s.Quantity.from_string("100m"),
-                                        "memory": k8s.Quantity.from_string("100Mi"),
-                                    },
-                                ),
-                                # liveness_probe=k8s.Probe(
-                                #     http_get=k8s.HttpGetAction(
-                                #         path='/index.php',
-                                #         port=k8s.IntOrString.from_number(80)
-                                #     ),
-                                #     initial_delay_seconds=60,
-                                #     period_seconds=10,
-                                # ),
-                                # readiness_probe=k8s.Probe(
-                                #     http_get=k8s.HttpGetAction(
-                                #         path='/index.php',
-                                #         port=k8s.IntOrString.from_number(80)
-                                #     ),
-                                #     initial_delay_seconds=10,
-                                #     period_seconds=5,
-                                # ),
-                            )
-                        ],
+                        containers=[container],
                     ),
                 ),
             ),
@@ -91,6 +91,7 @@ class NextcloudWebService(Construct):
         k8s.KubeService(
             self,
             "service",
+            metadata=k8s.ObjectMeta(name="nextcloud"),
             spec=k8s.ServiceSpec(
                 type="LoadBalancer",
                 ports=[
