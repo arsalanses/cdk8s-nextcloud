@@ -1,7 +1,5 @@
 # cdk8s for nextcloud
 
-<!-- ![diagram](./diagram.png) -->
-
 <p align="center">
     <img src="./diagram.png" alt="diagram" width="90%">
 </p>
